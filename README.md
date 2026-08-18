@@ -1,70 +1,55 @@
-# Getting Started with Create React App
+# Offline School Manager
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A school management web app that works fully offline. It manages students, evaluations (grades), and payments, with all data persisted locally in the browser using **IndexedDB** through **Dexie.js** — no backend or internet connection required.
 
-## Available Scripts
+> **Status:** Work in progress. Core CRUD functionality for students, evaluations, and payments is being implemented as an MVP. See [Roadmap](#roadmap) below for the full planned data model.
 
-In the project directory, you can run:
+## Why offline-first?
 
-### `npm start`
+This project was built to solve a real need: small tutoring/review schools often don't have reliable internet access, but still need to track student records, grades, and payments digitally. Instead of relying on a server, all data is stored directly in the browser using IndexedDB, so the app keeps working with no connection at all.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Tech stack
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- **React** — UI
+- **Dexie.js** — a wrapper over IndexedDB, used for local, structured, relational-style data persistence
+- **Vite** — build tool
 
-### `npm test`
+## Why IndexedDB (and not SQLite or localStorage)?
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- `localStorage` only stores simple key-value strings — not suitable for structured, relational data like students, grades, and payments.
+- SQLite in the browser (via WebAssembly, e.g. sql.js) doesn't persist data on its own — it still needs IndexedDB underneath to save permanently, adding unnecessary complexity for this use case.
+- IndexedDB is the native browser technology for offline storage. Dexie.js wraps it in a clean, promise-based API.
 
-### `npm run build`
+## Data model (MVP)
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+| Entity | Fields |
+|---|---|
+| **Students** | id, full name, address, phone, birth date, grade, group |
+| **Subjects** | id, name |
+| **Evaluations** | id, student (FK), subject (FK), evaluation type, score, date |
+| **Payments** | id, student (FK), date, payment method, amount, installments |
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Relations between tables (e.g. evaluations belonging to a student) are resolved in application code, since IndexedDB has no built-in JOIN support.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Getting started
 
-### `npm run eject`
+```bash
+npm install
+npm run dev
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Open `http://localhost:5173`.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Roadmap
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+This MVP is a deliberately scoped-down version of a larger data model originally designed for a real tutoring school, covering 14 entities in total (schools, parents/tutors with a many-to-many relationship, attendance tracking, class schedules, parent meetings, internal regulations, and services). Those are documented as future scope but not yet implemented, in order to ship a focused, working MVP first.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Planned next steps:
+- [ ] Dashboard with summary stats (total students, pending payments, upcoming exams)
+- [ ] Attendance tracking
+- [ ] Parent/tutor records (many-to-many relationship with students)
+- [ ] Basic reporting
 
-## Learn More
+## License
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+MIT
